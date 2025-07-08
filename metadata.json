@@ -1,0 +1,5 @@
+{
+  "name": "AI議事録ジェネレーター",
+  "description": "音声ファイルをアップロードして、AIが議事録や議事概要を自動で作成するアプリケーションです。",
+  "requestFramePermissions": []
+}
