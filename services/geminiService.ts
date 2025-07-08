@@ -2,11 +2,14 @@
 import { GoogleGenAI } from "@google/genai";
 import { OutputType } from '../types';
 
-if (!process.env.API_KEY) {
-  throw new Error("API_KEY environment variable not set");
-}
+let aiInstance: GoogleGenAI | null = null;
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+export const initializeGeminiAI = (apiKey: string) => {
+  if (!apiKey) {
+    throw new Error("API key is required");
+  }
+  aiInstance = new GoogleGenAI({ apiKey });
+};
 
 // Helper to convert a File object to a GoogleGenerativeAI.Part object.
 async function fileToGenerativePart(file: File) {
@@ -85,15 +88,25 @@ const getPrompt = (outputType: OutputType, fileName: string) => {
 
 export const generateContent = async (
   file: File,
-  outputType: OutputType
+  outputType: OutputType,
+  apiKey?: string
 ): Promise<string> => {
   try {
+    // Initialize with provided API key if not already initialized
+    if (apiKey && !aiInstance) {
+      initializeGeminiAI(apiKey);
+    }
+    
+    if (!aiInstance) {
+      throw new Error("Gemini AI が初期化されていません。APIキーを設定してください。");
+    }
+
     const audioPart = await fileToGenerativePart(file);
     const promptText = getPrompt(outputType, file.name);
 
     const contents = [{ text: promptText }, audioPart];
 
-    const response = await ai.models.generateContent({
+    const response = await aiInstance.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: contents,
     });
