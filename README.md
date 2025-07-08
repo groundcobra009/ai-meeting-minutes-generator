@@ -1,14 +1,62 @@
-# Run and deploy your AI Studio app
+# AI議事録ジェネレーター
 
-This contains everything you need to run your app locally.
+AI議事録ジェネレーターは、会議の音声ファイルから自動的に議事録を生成するWebアプリケーションです。
 
-## Run Locally
+## 機能
 
-**Prerequisites:**  Node.js
+- 音声ファイルのアップロード
+- 音声からテキストへの自動変換
+- AI による議事録の自動生成
+- 生成された議事録のダウンロード
 
+## 必要な環境
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- Node.js 18.0以上
+- npm または yarn
+
+## セットアップ
+
+1. リポジトリをクローン
+```bash
+git clone [リポジトリURL]
+cd ai議事録ジェネレーター
+```
+
+2. 依存関係をインストール
+```bash
+npm install
+```
+
+3. 環境変数を設定
+`.env.local` ファイルに必要なAPIキーを設定してください。
+
+```bash
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+4. 開発サーバーを起動
+```bash
+npm run dev
+```
+
+5. ブラウザで http://localhost:3000 にアクセス
+
+## 使い方
+
+1. トップページで「ファイルを選択」ボタンをクリック
+2. 会議の音声ファイル（MP3、WAV、M4Aなど）を選択
+3. 「アップロード」ボタンをクリック
+4. AIが音声を解析し、議事録を生成
+5. 生成された議事録をダウンロード
+
+## 技術スタック
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Google Gemini API（音声認識・議事録生成）
+
+## ライセンス
+
+[ライセンス情報を記載]
