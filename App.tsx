@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { OutputType } from './types';
 import { generateContent, initializeGeminiAI } from './services/geminiService';
 import Header from './components/Header';
 import FileUpload from './components/FileUpload';
@@ -7,10 +6,11 @@ import OutputTypeSelector from './components/OutputTypeSelector';
 import ResultDisplay from './components/ResultDisplay';
 import LoadingSpinner from './components/LoadingSpinner';
 import ApiKeyInput from './components/ApiKeyInput';
+import HelpMenu from './components/HelpMenu';
 
 const App: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [outputType, setOutputType] = useState<OutputType>(OutputType.MINUTES);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('detailed_minutes');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [result, setResult] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -37,7 +37,7 @@ const App: React.FC = () => {
     setResult('');
 
     try {
-      const generatedText = await generateContent(file, outputType, apiKey);
+      const generatedText = await generateContent(file, selectedTemplateId, apiKey);
       setResult(generatedText);
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : '不明なエラーが発生しました。';
@@ -46,7 +46,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [file, outputType, apiKey]);
+  }, [file, selectedTemplateId, apiKey]);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
@@ -57,8 +57,8 @@ const App: React.FC = () => {
             <ApiKeyInput apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
             <h2 className="text-xl font-bold text-center text-gray-700 pt-4">2. 音声ファイルをアップロード</h2>
             <FileUpload file={file} onFileChange={setFile} />
-            <h2 className="text-xl font-bold text-center text-gray-700 pt-4">3. 出力タイプを選択</h2>
-            <OutputTypeSelector selectedType={outputType} onChange={setOutputType} />
+            <h2 className="text-xl font-bold text-center text-gray-700 pt-4">3. テンプレートを選択</h2>
+            <OutputTypeSelector selectedTemplateId={selectedTemplateId} onChange={setSelectedTemplateId} />
             <button
                 onClick={handleGenerate}
                 disabled={!file || isLoading || !apiKey}
@@ -83,6 +83,7 @@ const App: React.FC = () => {
       <footer className="text-center p-4 text-sm text-gray-500">
         © 2025 keitaro. All Rights Reserved.
       </footer>
+      <HelpMenu />
     </div>
   );
 };

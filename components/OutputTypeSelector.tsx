@@ -1,35 +1,39 @@
-
 import React from 'react';
-import { OutputType } from '../types';
+import { SUMMARY_TEMPLATES, SummaryTemplate } from '../types/templates';
 
 interface OutputTypeSelectorProps {
-  selectedType: OutputType;
-  onChange: (type: OutputType) => void;
+  selectedTemplateId: string;
+  onChange: (templateId: string) => void;
 }
 
-const OutputTypeSelector: React.FC<OutputTypeSelectorProps> = ({ selectedType, onChange }) => {
+const OutputTypeSelector: React.FC<OutputTypeSelectorProps> = ({ selectedTemplateId, onChange }) => {
   return (
-    <div className="flex w-full max-w-lg rounded-lg bg-gray-200 p-1">
-      <button
-        onClick={() => onChange(OutputType.MINUTES)}
-        className={`w-1/2 rounded-md py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
-          selectedType === OutputType.MINUTES
-            ? 'bg-white text-gray-900 shadow'
-            : 'bg-transparent text-gray-600 hover:bg-gray-100'
-        }`}
-      >
-        議事録 (詳細)
-      </button>
-      <button
-        onClick={() => onChange(OutputType.SUMMARY)}
-        className={`w-1/2 rounded-md py-2.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
-          selectedType === OutputType.SUMMARY
-            ? 'bg-white text-gray-900 shadow'
-            : 'bg-transparent text-gray-600 hover:bg-gray-100'
-        }`}
-      >
-        議事概要 (要約)
-      </button>
+    <div className="w-full max-w-4xl">
+      <h3 className="text-lg font-semibold text-gray-700 mb-4">テンプレートを選択してください</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {SUMMARY_TEMPLATES.map((template) => (
+          <button
+            key={template.id}
+            onClick={() => onChange(template.id)}
+            className={`
+              p-4 rounded-lg border-2 transition-all duration-200 text-left
+              hover:shadow-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500
+              ${selectedTemplateId === template.id
+                ? 'border-blue-500 bg-blue-50 shadow-md'
+                : 'border-gray-200 bg-white hover:border-gray-300'
+              }
+            `}
+          >
+            <div className="flex items-start space-x-3">
+              <span className="text-2xl">{template.icon}</span>
+              <div className="flex-1">
+                <h4 className="font-semibold text-gray-900">{template.name}</h4>
+                <p className="text-sm text-gray-600 mt-1">{template.description}</p>
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
