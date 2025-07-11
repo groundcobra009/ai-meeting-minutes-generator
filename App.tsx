@@ -69,32 +69,45 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-gray-50 text-gray-800">
       <Header />
       <main className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* When no result, center the input form */}
+        {/* Initial layout with steps 1-2 on left, step 3 on right */}
         {!result && !isLoading ? (
-          <div className="flex justify-center">
-            <div className="w-full max-w-lg space-y-6 rounded-xl bg-white p-6 lg:p-8 shadow-sm border border-gray-200">
-              <h2 className="text-xl font-bold text-center text-gray-700">1. APIキーを設定</h2>
-              <ApiKeyInput apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
-              <h2 className="text-xl font-bold text-center text-gray-700 pt-4">2. 音声ファイルをアップロード</h2>
-              <FileUpload file={file} onFileChange={setFile} />
-              <h2 className="text-xl font-bold text-center text-gray-700 pt-4">3. テンプレートを選択</h2>
-              <OutputTypeSelector selectedTemplateId={selectedTemplateId} onChange={setSelectedTemplateId} />
-              <button
-                  onClick={handleGenerate}
-                  disabled={!file || isLoading || !apiKey}
-                  className="w-full rounded-lg bg-blue-600 px-6 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400"
-              >
-                  {isLoading ? '生成中...' : '議事録を生成する'}
-              </button>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left side: Steps 1 & 2 */}
+            <div className="space-y-6">
+              <div className="rounded-xl bg-white p-6 lg:p-8 shadow-sm border border-gray-200">
+                <h2 className="text-xl font-bold text-center text-gray-700 mb-4">1. APIキーを設定</h2>
+                <ApiKeyInput apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
+              </div>
+              
+              <div className="rounded-xl bg-white p-6 lg:p-8 shadow-sm border border-gray-200">
+                <h2 className="text-xl font-bold text-center text-gray-700 mb-4">2. 音声ファイルをアップロード</h2>
+                <FileUpload file={file} onFileChange={setFile} />
+              </div>
+            </div>
+            
+            {/* Right side: Step 3 */}
+            <div className="space-y-6">
+              <div className="rounded-xl bg-white p-6 lg:p-8 shadow-sm border border-gray-200">
+                <h2 className="text-xl font-bold text-center text-gray-700 mb-4">3. テンプレートを選択</h2>
+                <OutputTypeSelector selectedTemplateId={selectedTemplateId} onChange={setSelectedTemplateId} />
+                
+                <button
+                    onClick={handleGenerate}
+                    disabled={!file || isLoading || !apiKey}
+                    className="w-full mt-6 rounded-lg bg-blue-600 px-6 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400"
+                >
+                    {isLoading ? '生成中...' : '議事録を生成する'}
+                </button>
+              </div>
               
               {error && (
-                <div className="w-full rounded-md bg-red-100 p-4 text-center text-red-700 mt-4">
+                <div className="w-full rounded-md bg-red-100 p-4 text-center text-red-700">
                   {error}
                 </div>
               )}
 
               {isLoading && (
-                <div className="flex flex-col items-center gap-4 mt-6">
+                <div className="flex flex-col items-center gap-4">
                   <LoadingSpinner />
                   {progress && (
                     <p className="text-center text-gray-600 animate-pulse">
@@ -106,23 +119,32 @@ const App: React.FC = () => {
             </div>
           </div>
         ) : (
-          /* When result exists or loading, use grid layout */
+          /* When result exists, use compact layout */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Input Section */}
+            {/* Compact Input Section */}
             <div className="lg:col-span-4">
-              <div className="sticky top-8 space-y-6 rounded-xl bg-white p-6 shadow-sm border border-gray-200">
-                <h2 className="text-xl font-bold text-center text-gray-700">1. APIキーを設定</h2>
-                <ApiKeyInput apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
-                <h2 className="text-xl font-bold text-center text-gray-700 pt-4">2. 音声ファイルをアップロード</h2>
-                <FileUpload file={file} onFileChange={setFile} />
-                <h2 className="text-xl font-bold text-center text-gray-700 pt-4">3. テンプレートを選択</h2>
-                <OutputTypeSelector selectedTemplateId={selectedTemplateId} onChange={setSelectedTemplateId} />
+              <div className="sticky top-8 space-y-4 rounded-xl bg-white p-4 lg:p-6 shadow-sm border border-gray-200">
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-gray-700">1. APIキー</h3>
+                  <ApiKeyInput apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
+                </div>
+                
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-gray-700">2. 音声ファイル</h3>
+                  <FileUpload file={file} onFileChange={setFile} />
+                </div>
+                
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-gray-700">3. テンプレート</h3>
+                  <OutputTypeSelector selectedTemplateId={selectedTemplateId} onChange={setSelectedTemplateId} />
+                </div>
+                
                 <button
                     onClick={handleGenerate}
                     disabled={!file || isLoading || !apiKey}
-                    className="w-full rounded-lg bg-blue-600 px-6 py-3.5 text-base font-semibold text-white shadow-md transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400"
+                    className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400"
                 >
-                    {isLoading ? '生成中...' : '議事録を生成する'}
+                    {isLoading ? '生成中...' : '再生成'}
                 </button>
               </div>
             </div>
