@@ -68,8 +68,11 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
       <Header />
-      <main className="container mx-auto flex flex-col items-center gap-8 p-4 sm:p-8">
-        <div className="w-full max-w-lg space-y-6 rounded-xl bg-white p-8 shadow-sm border border-gray-200">
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Input Section */}
+          <div className="lg:col-span-5 xl:col-span-4">
+            <div className="sticky top-8 space-y-6 rounded-xl bg-white p-6 lg:p-8 shadow-sm border border-gray-200">
             <h2 className="text-xl font-bold text-center text-gray-700">1. APIキーを設定</h2>
             <ApiKeyInput apiKey={apiKey} onApiKeyChange={handleApiKeyChange} />
             <h2 className="text-xl font-bold text-center text-gray-700 pt-4">2. 音声ファイルをアップロード</h2>
@@ -83,28 +86,33 @@ const App: React.FC = () => {
             >
                 {isLoading ? '生成中...' : '議事録を生成する'}
             </button>
-        </div>
-
-        {error && (
-          <div className="w-full max-w-4xl rounded-md bg-red-100 p-4 text-center text-red-700">
-            {error}
+            </div>
           </div>
-        )}
+          
+          {/* Results Section */}
+          <div className="lg:col-span-7 xl:col-span-8">
+            {error && (
+              <div className="w-full rounded-md bg-red-100 p-4 text-center text-red-700 mb-4">
+                {error}
+              </div>
+            )}
 
-        {isLoading && (
-          <div className="flex flex-col items-center gap-4">
-            <LoadingSpinner />
-            {progress && (
-              <p className="text-center text-gray-600 animate-pulse">
-                {progress}
-              </p>
+            {isLoading && (
+              <div className="flex flex-col items-center justify-center h-64 gap-4">
+                <LoadingSpinner />
+                {progress && (
+                  <p className="text-center text-gray-600 animate-pulse">
+                    {progress}
+                  </p>
+                )}
+              </div>
+            )}
+            
+            {result && !isLoading && (
+                <ResultDisplay result={result} />
             )}
           </div>
-        )}
-        
-        {result && !isLoading && (
-            <ResultDisplay result={result} />
-        )}
+        </div>
       </main>
       <footer className="text-center p-4 text-sm text-gray-500">
         © 2025 keitaro. All Rights Reserved.

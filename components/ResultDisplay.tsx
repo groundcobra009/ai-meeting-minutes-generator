@@ -24,7 +24,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
   }, [copied]);
 
   return (
-    <div className="relative w-full max-w-4xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="relative w-full rounded-lg border border-gray-200 bg-white p-6 lg:p-8 shadow-sm">
       <button
         onClick={handleCopy}
         className="absolute top-3 right-3 flex items-center gap-2 rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
@@ -41,8 +41,8 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
           </>
         )}
       </button>
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">生成結果</h3>
-      <div className="prose prose-sm max-w-none whitespace-pre-wrap text-gray-700">
+      <h3 className="text-lg lg:text-xl font-semibold text-gray-800 mb-4">生成結果</h3>
+      <div className="prose prose-sm lg:prose-base max-w-none whitespace-pre-wrap text-gray-700 overflow-x-auto">
         {result}
       </div>
     </div>
