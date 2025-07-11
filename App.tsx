@@ -15,6 +15,7 @@ const App: React.FC = () => {
   const [result, setResult] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [apiKey, setApiKey] = useState<string>('');
+  const [progress, setProgress] = useState<string>('');
 
   const handleApiKeyChange = (newApiKey: string) => {
     setApiKey(newApiKey);
@@ -35,16 +36,32 @@ const App: React.FC = () => {
     setIsLoading(true);
     setError('');
     setResult('');
+    setProgress('音声ファイルを処理中...');
 
     try {
+      // Show progress updates
+      setTimeout(() => {
+        if (isLoading) {
+          setProgress('AIが内容を分析中... (これには数分かかる場合があります)');
+        }
+      }, 5000);
+
+      setTimeout(() => {
+        if (isLoading) {
+          setProgress('議事録を生成中... もうしばらくお待ちください...');
+        }
+      }, 20000);
+
       const generatedText = await generateContent(file, selectedTemplateId, apiKey);
       setResult(generatedText);
+      setProgress('');
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : '不明なエラーが発生しました。';
       setError(`生成に失敗しました: ${errorMessage}`);
       console.error(e);
     } finally {
       setIsLoading(false);
+      setProgress('');
     }
   }, [file, selectedTemplateId, apiKey]);
 
@@ -74,7 +91,16 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {isLoading && <LoadingSpinner />}
+        {isLoading && (
+          <div className="flex flex-col items-center gap-4">
+            <LoadingSpinner />
+            {progress && (
+              <p className="text-center text-gray-600 animate-pulse">
+                {progress}
+              </p>
+            )}
+          </div>
+        )}
         
         {result && !isLoading && (
             <ResultDisplay result={result} />

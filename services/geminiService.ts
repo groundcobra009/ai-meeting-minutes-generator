@@ -1,18 +1,31 @@
 
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { OutputType } from '../types';
 import { SUMMARY_TEMPLATES } from '../types/templates';
 
-let aiInstance: GoogleGenAI | null = null;
+let aiInstance: GoogleGenerativeAI | null = null;
+
+// Configuration for API calls
+const API_CONFIG = {
+  maxRetries: 3,
+  retryDelay: 1000, // 1 second
+  timeout: 300000, // 5 minutes
+  generationConfig: {
+    temperature: 0.7,
+    topK: 1,
+    topP: 1,
+    maxOutputTokens: 8192,
+  },
+};
 
 export const initializeGeminiAI = (apiKey: string) => {
   if (!apiKey) {
     throw new Error("API key is required");
   }
-  aiInstance = new GoogleGenAI({ apiKey });
+  aiInstance = new GoogleGenerativeAI(apiKey);
 };
 
-// Helper to convert a File object to a GoogleGenerativeAI.Part object.
+// Helper to convert a File object to a generative part.
 async function fileToGenerativePart(file: File) {
   const base64EncodedDataPromise = new Promise<string>((resolve) => {
     const reader = new FileReader();
@@ -42,36 +55,114 @@ const getPromptByTemplateId = (templateId: string, fileName: string) => {
   return template.prompt.replace(/{fileName}/g, fileName);
 };
 
+// Helper function to wait for a specified time
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Helper function to check if error is retryable
+const isRetryableError = (error: any): boolean => {
+  if (!error) return false;
+  
+  // Check for common retryable errors
+  const errorMessage = error.message?.toLowerCase() || '';
+  const retryableMessages = [
+    'timeout',
+    'network',
+    'rate limit',
+    '429',
+    '503',
+    '504',
+    'temporarily unavailable',
+  ];
+  
+  return retryableMessages.some(msg => errorMessage.includes(msg));
+};
+
 export const generateContent = async (
   file: File,
   templateId: string,
   apiKey?: string
 ): Promise<string> => {
-  try {
-    // Initialize with provided API key if not already initialized
-    if (apiKey && !aiInstance) {
-      initializeGeminiAI(apiKey);
-    }
-    
-    if (!aiInstance) {
-      throw new Error("Gemini AI が初期化されていません。APIキーを設定してください。");
-    }
-
-    const audioPart = await fileToGenerativePart(file);
-    const promptText = getPromptByTemplateId(templateId, file.name);
-
-    const contents = [{ text: promptText }, audioPart];
-
-    const response = await aiInstance.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: contents,
-    });
-    return response.text;
-  } catch (error) {
-    console.error("Error generating content:", error);
-    if (error instanceof Error) {
-      return `エラーが発生しました: ${error.message}`;
-    }
-    return "不明なエラーが発生しました。";
+  // Initialize with provided API key if not already initialized
+  if (apiKey && !aiInstance) {
+    initializeGeminiAI(apiKey);
   }
+  
+  if (!aiInstance) {
+    throw new Error("Gemini AI が初期化されていません。APIキーを設定してください。");
+  }
+
+  const audioPart = await fileToGenerativePart(file);
+  const promptText = getPromptByTemplateId(templateId, file.name);
+
+  // Add system message for completion
+  const enhancedPrompt = `${promptText}
+
+重要: 必ず最後まで完全な内容を生成してください。途中で切れないよう、全ての項目を含めて回答してください。`;
+
+  const contents = [{ text: enhancedPrompt }, audioPart];
+
+  let lastError: Error | null = null;
+  
+  // Retry logic
+  for (let attempt = 1; attempt <= API_CONFIG.maxRetries; attempt++) {
+    try {
+      console.log(`生成試行 ${attempt}/${API_CONFIG.maxRetries}...`);
+      
+      const model = aiInstance.getGenerativeModel({ 
+        model: 'gemini-2.0-flash-exp',
+        generationConfig: API_CONFIG.generationConfig,
+      });
+      
+      // Create chat session for better context handling
+      const chat = model.startChat({
+        history: [],
+      });
+      
+      const result = await chat.sendMessage(contents);
+      const text = result.response.text();
+      
+      // Check if response seems complete
+      if (!text || text.length < 100) {
+        throw new Error('レスポンスが不完全です。再試行します。');
+      }
+      
+      // Check for common incomplete patterns
+      const incompletePatterns = [
+        /\.{3}$/,  // Ends with ...
+        /[^。.!?]$/,  // Doesn't end with punctuation
+        /続く$/,  // Ends with "to be continued"
+      ];
+      
+      const seemsIncomplete = incompletePatterns.some(pattern => pattern.test(text.trim()));
+      
+      if (seemsIncomplete && attempt < API_CONFIG.maxRetries) {
+        console.log('レスポンスが不完全な可能性があります。再試行します...');
+        throw new Error('レスポンスが不完全です。');
+      }
+      
+      return text;
+    } catch (error) {
+      console.error(`試行 ${attempt} でエラー:`, error);
+      lastError = error as Error;
+      
+      // Don't retry if it's not a retryable error and we've tried once
+      if (attempt > 1 && !isRetryableError(error)) {
+        break;
+      }
+      
+      // Wait before retrying (exponential backoff)
+      if (attempt < API_CONFIG.maxRetries) {
+        const waitTime = API_CONFIG.retryDelay * Math.pow(2, attempt - 1);
+        console.log(`${waitTime}ms 後に再試行します...`);
+        await delay(waitTime);
+      }
+    }
+  }
+  
+  // All retries failed
+  console.error("全ての試行が失敗しました:", lastError);
+  if (lastError instanceof Error) {
+    throw new Error(`生成に失敗しました (${API_CONFIG.maxRetries}回試行): ${lastError.message}`);
+  }
+  throw new Error("不明なエラーが発生しました。");
 };
