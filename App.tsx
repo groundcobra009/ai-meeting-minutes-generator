@@ -33,6 +33,16 @@ const App: React.FC = () => {
       setError('APIキーを設定してください。');
       return;
     }
+    
+    // Validate file type
+    const supportedTypes = ['.mp3', '.mp4', '.wav', '.m4a'];
+    const fileName = file.name.toLowerCase();
+    const fileExtension = fileName.substring(fileName.lastIndexOf('.'));
+    
+    if (!supportedTypes.includes(fileExtension)) {
+      setError(`サポートされていないファイル形式です。対応形式: ${supportedTypes.join(', ')}`);
+      return;
+    }
     setIsLoading(true);
     setError('');
     setResult('');

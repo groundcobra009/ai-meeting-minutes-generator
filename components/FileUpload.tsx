@@ -38,7 +38,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ file, onFileChange }) => {
         ref={inputRef}
         onChange={handleFileChange}
         className="hidden"
-        accept="audio/mpeg,audio/wav,audio/mp4,audio/x-m4a,video/mp4,audio/*"
+        accept=".mp3,.mp4,.wav,.m4a,audio/*,video/mp4"
       />
       {file ? (
         <div className="flex flex-col items-center justify-center text-gray-700">

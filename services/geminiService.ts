@@ -37,9 +37,16 @@ async function fileToGenerativePart(file: File) {
     reader.readAsDataURL(file);
   });
   
+  // Handle MP4 files by ensuring correct MIME type
+  let mimeType = file.type;
+  if (file.name.toLowerCase().endsWith('.mp4') || file.type === 'video/mp4') {
+    // Gemini API expects audio/mp4 for audio content in MP4 container
+    mimeType = 'audio/mp4';
+  }
+  
   return {
     inlineData: {
-      mimeType: file.type,
+      mimeType: mimeType,
       data: await base64EncodedDataPromise,
     },
   };
