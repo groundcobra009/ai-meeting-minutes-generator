@@ -9,8 +9,7 @@ interface OutputTypeSelectorProps {
 const OutputTypeSelector: React.FC<OutputTypeSelectorProps> = ({ selectedTemplateId, onChange }) => {
   return (
     <div className="w-full max-w-4xl">
-      <h3 className="text-lg font-semibold text-gray-700 mb-4">テンプレートを選択してください</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {SUMMARY_TEMPLATES.map((template) => (
           <button
             key={template.id}

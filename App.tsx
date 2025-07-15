@@ -88,7 +88,7 @@ const App: React.FC = () => {
             {/* Right side: Step 3 */}
             <div className="space-y-6">
               <div className="rounded-xl bg-white p-6 lg:p-8 shadow-sm border border-gray-200">
-                <h2 className="text-xl font-bold text-center text-gray-700 mb-4">3. テンプレートを選択</h2>
+                <h2 className="text-xl font-bold text-center text-gray-700 mb-4">3. 出力形式を選択</h2>
                 <OutputTypeSelector selectedTemplateId={selectedTemplateId} onChange={setSelectedTemplateId} />
                 
                 <button
@@ -135,7 +135,7 @@ const App: React.FC = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  <h3 className="text-lg font-semibold text-gray-700">3. テンプレート</h3>
+                  <h3 className="text-lg font-semibold text-gray-700">3. 出力形式</h3>
                   <OutputTypeSelector selectedTemplateId={selectedTemplateId} onChange={setSelectedTemplateId} />
                 </div>
                 

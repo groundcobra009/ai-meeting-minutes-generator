@@ -38,7 +38,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ file, onFileChange }) => {
         ref={inputRef}
         onChange={handleFileChange}
         className="hidden"
-        accept="audio/mpeg,audio/wav,audio/mp4,audio/x-m4a,audio/*"
+        accept="audio/mpeg,audio/wav,audio/mp4,audio/x-m4a,video/mp4,audio/*"
       />
       {file ? (
         <div className="flex flex-col items-center justify-center text-gray-700">
@@ -59,7 +59,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ file, onFileChange }) => {
             音声ファイルをここにドラッグ＆ドロップ
           </p>
           <p className="mt-1 text-sm">またはクリックしてファイルを選択</p>
-          <p className="mt-4 text-xs text-gray-400">対応形式: MP3, WAV, M4Aなど</p>
+          <p className="mt-4 text-xs text-gray-400">対応形式: MP3, MP4, WAV, M4Aなど</p>
         </div>
       )}
     </div>
